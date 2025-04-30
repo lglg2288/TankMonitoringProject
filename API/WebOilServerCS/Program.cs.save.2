@@ -1,0 +1,51 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
+using System.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Настраиваем CORS (чтобы страница с другого домена могла обращаться)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+var app = builder.Build();
+
+app.UseCors();
+
+// Строка подключения к PostgreSQL
+var connectionString = "Host=localhost;Port=5432;Username=postgres;Password=HFrejneD3U;Database=postgrnn);
+    cmd.Parameters.AddWithValue("startDate", DateTime.Parse(startDate));
+    cmd.Parameters.AddWithValue("endDate", DateTime.Parse(endDate));
+    cmd.Parameters.AddWithValue("tank", tank);
+
+    await using var reader = await cmd.ExecuteReaderAsync();
+    while (await reader.ReadAsync())
+    {
+        measurements.Add(new
+        {
+            time = reader.GetDateTime(0),
+            density = reader.GetDouble(1)
+        });
+    }
+
+    await context.Response.WriteAsJsonAsync(measurements);
+});
+
+app.Run("http://0.0.0.0:5000");
+
+
+
+
+
+
+
+

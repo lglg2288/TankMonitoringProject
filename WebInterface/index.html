@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>График плотности</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>График плотности нефтепродуктов</h1>
+
+    <label>Дата начала: <input type="datetime-local" id="startDate"></label>
+    <label>Дата окончания: <input type="datetime-local" id="endDate"></label>
+    <label>Резервуар: 
+        <select id="tankNumber">
+            <option value="TANK001">TANK001</option>
+            <option value="TANK002">TANK002</option>
+            <option value="TANK003">TANK003</option>
+        </select>
+    </label>
+    <button onclick="loadChart()">Показать график</button>
+
+    <canvas id="myChart" width="400" height="200"></canvas>
+
+    <script>
+        let chartInstance = null;
+
+        async function loadChart() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const tankNumber = document.getElementById('tankNumber').value;
+
+            const response = await fetch(`http://IP_ВАШЕГО_СЕРВЕРА:ПОРТ_ВАШЕГО_СЕРВЕРА/measurements?startDateTime=${startDate}&endDateTime=${endDate}&tank=${tankNumber}`);
+            
+            if (!response.ok) {
+                console.error('Ошибка при запросе данных!');
+                return;
+            }
+
+            const data = await response.json();
+            if (data.length === 0) {
+                console.log("Нет данных для отображения.");
+                return;
+            }
+
+            const labels = data.map(entry => entry.time);
+            const densities = data.map(entry => entry.density);
+
+            const ctx = document.getElementById('myChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Плотность нефтепродуктов (кг/м³)',
+                        data: densities,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Время'
+                            },
+                            ticks: {
+                                maxRotation: 90,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Плотность (кг/м³)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

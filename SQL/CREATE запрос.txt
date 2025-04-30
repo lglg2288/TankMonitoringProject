@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS public.oil_measurements
+(
+    id integer NOT NULL DEFAULT nextval('oil_measurements_id_seq'::regclass),
+    measurement_time timestamp without time zone NOT NULL,
+    tank_number text COLLATE pg_catalog."default" NOT NULL,
+    density_kg_m3 numeric(10,2) NOT NULL,
+    mass_kg numeric(12,2) NOT NULL,
+    CONSTRAINT oil_measurements_pkey PRIMARY KEY (id)
+)
